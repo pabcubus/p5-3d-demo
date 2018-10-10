@@ -1,0 +1,7 @@
+/bower_components
+/node_modules
+/app/styles/.sass-cache
+/app/styles/*.css
+/dist
+.DS_Store
+package-lock.json
