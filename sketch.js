@@ -1,55 +1,68 @@
-let width		= 800;
-let height		= 800;
 let step		= 50;
 let cubeCount	= 2
 let cubeSpacing	= 20;
 let cubeW		= 30;
-let cubeH		= 100;
-let cubeD		= 10;
+let cubeH		= 30;
+let cubeD		= 70;
 let multiplier	= 100;
+let mouseZ		= 0;
+
+let map			= [
+	[1,1,1,1,1,1,0,0,0,0,0],
+	[1,0,0,0,0,1,0,0,0,0,0],
+	[1,0,0,0,0,1,1,0,0,0,0],
+	[1,0,0,0,0,0,1,1,1,1,1],
+	[1,0,0,0,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,0,0,0,1],
+	[1,0,0,0,0,0,0,0,0,0,1],
+	[1,0,0,0,1,1,1,0,0,0,1],
+	[1,1,1,1,1,0,1,1,1,1,1]
+]
+
+let area		= (cubeW * map.length);
+let width		= area * 2;
+let height		= width;
 
 function setup() {
 	createCanvas(width, height, WEBGL);
 }
 
+function mouseWheel(event) {
+	mouseZ += (event.delta);
+}
+
 function draw() {
 	background(175);
-	ortho();
+	//ortho();
 	ambientLight(255);
 
-	rotateY(PI/(multiplier/mouseX));
-	rotateX(PI/(multiplier/mouseY));
+	//rotateY(PI / (multiplier / mouseX));
+	//rotateX(QUARTER_PI * -1);
+	//rotateX(PI / (multiplier / mouseY));
 
-	let pair		= (cubeCount % 2 == 0) ? true : false;
-	let sum1		= (cubeW * cubeCount) + (cubeSpacing * (cubeCount - 1));
-	let initialX	= 0 - ((cubeW + cubeSpacing) * 1);
-/*
-	drawCube(0 - ((cubeW + cubeSpacing) * 1), 0, 0, cubeW, cubeH, cubeD);
-	drawCube(0 - ((cubeW + cubeSpacing) * 0), 0, 0, cubeW, cubeH, cubeD);
-	drawCube(cubeW + cubeSpacing, 0, 0, cubeW, cubeH, cubeD);
-	*/
+	camera(area/2+(-mouseX), area/2+(-mouseY), mouseZ, 0, 0, 0, 0, 0, 0);
 
-	drawCube(0 - ((cubeW + cubeSpacing) * 1), 0, 0, cubeW, cubeH, cubeD);
-	drawCube(0 - ((cubeW + cubeSpacing) * 0), 0, 0, cubeW, cubeH, cubeD);
-	drawCube(cubeW + cubeSpacing, 0, 0, cubeW, cubeH, cubeD);
+	drawStructure(map);
+}
 
-/*
-	for (let count = 0; count < cubeCount; count++) {
-		push();
+function drawStructure(map) {
+	let x			= 0 - ((map.length * 30)/2);
+	let y			= 0 - ((map[0].length * 30)/2);
 
-		stroke(155);
-		let posX = initialX + ((cubeW + cubeSpacing) * count);
-		translate(posX, 0, 0);
-		normalMaterial();
-		box(cubeW, cubeH, cubeD);
-
-		pop();
-	}*/
+	for (let i = 0; i < map.length; i++) {
+		x = 0 - ((map[0].length * 30)/2);
+		for (let j = 0; j < map[i].length; j++) {
+			if (map[i][j] == 1) drawCube(x, y, 0, cubeW, cubeW, cubeD);
+			x += 30;
+		}
+		y += 30;
+	}
 }
 
 function drawCube(x, y, z, boxW, boxH, boxD) {
 	push();
-	translate(x, 0, 0);
+	translate(x, y, z);
 	normalMaterial();
 	box(boxW, boxH, boxD);
 	pop();
