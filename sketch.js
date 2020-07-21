@@ -1,28 +1,37 @@
-let step		= 50;
-let cubeCount	= 2
+let step			= 50;
+let cubeCount		= 2
 let cubeSpacing	= 20;
-let cubeW		= 30;
-let cubeH		= 30;
-let cubeD		= 70;
-let multiplier	= 100;
+let cubeW			= 30;
+let cubeH			= 30;
+let cubeD			= 10;
+let multiplier		= 100;
 let mouseZ		= 0;
 
+let rotate 		= false;
+
+let x = 0;
+let staticX = 0;
+let y = 0;
+let staticY = 0;
+let z = 0;
+
+let rotY = 0;
+let rotX = 0;
+let angle = 0;
+
 let map			= [
-	[1,1,1,1,1,1,0,0,0,0,0],
-	[1,0,0,0,0,1,0,0,0,0,0],
-	[1,0,0,0,0,1,1,0,0,0,0],
-	[1,0,0,0,0,0,1,1,1,1,1],
-	[1,0,0,0,0,0,0,0,0,0,1],
-	[1,0,0,0,0,0,0,0,0,0,1],
-	[1,0,0,0,0,0,0,0,0,0,1],
-	[1,0,0,0,0,0,0,0,0,0,1],
-	[1,0,0,0,1,1,1,0,0,0,1],
-	[1,1,1,1,1,0,1,1,1,1,1]
+	[1,1,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+	[1,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0],
+	[1,0,0,1,0,0,1,1,0,0,1,1,1,0,0,1,0,0,0,1,1,0,0,0,0,0],
+	[1,1,1,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,0,1,0,0,0,0],
+	[1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,0,1,0,0,0,0],
+	[1,0,0,0,0,1,0,0,1,0,1,0,0,1,0,1,0,0,1,0,0,1,0,0,0,0],
+	[1,0,0,0,0,0,1,1,1,0,1,1,1,0,0,1,1,0,0,1,1,0,0,0,0,0],
 ]
 
 let area		= (cubeW * map.length);
-let width		= area * 2;
-let height		= width;
+let width		= window.innerWidth - 100;
+let height	= window.innerHeight - 100;
 
 function setup() {
 	createCanvas(width, height, WEBGL);
@@ -32,31 +41,42 @@ function mouseWheel(event) {
 	mouseZ += (event.delta);
 }
 
+function mousePressed() {
+	rotate = true;
+	staticX = mouseX - (window.innerWidth * 0.5);
+	staticY = mouseY - (window.innerHeight * 0.5);
+}
+
+function mouseReleased() {
+	rotate = false;
+}
+
 function draw() {
 	background(175);
-	//ortho();
 	ambientLight(255);
-
-	//rotateY(PI / (multiplier / mouseX));
-	//rotateX(QUARTER_PI * -1);
-	//rotateX(PI / (multiplier / mouseY));
-
-	camera(area/2+(-mouseX), area/2+(-mouseY), mouseZ, 0, 0, 0, 0, 0, 0);
-
 	drawStructure(map);
 }
 
 function drawStructure(map) {
-	let x			= 0 - ((map.length * 30)/2);
-	let y			= 0 - ((map[0].length * 30)/2);
+	if (rotate) {
+		y = staticY;
 
+		angle = angle < 360 ? (angle + 1) : 0;
+		rotY = radians(mouseX);
+		rotX = radians(mouseY);
+	} else {
+		x	= mouseX - (window.innerWidth * 0.5)//0;
+		y	= mouseY - (window.innerHeight * 0.5);
+		z	= mouseZ;
+	}
+	
 	for (let i = 0; i < map.length; i++) {
-		x = 0 - ((map[0].length * 30)/2);
+		x = !rotate ? mouseX - (window.innerWidth * 0.5) : staticX;
 		for (let j = 0; j < map[i].length; j++) {
-			if (map[i][j] == 1) drawCube(x, y, 0, cubeW, cubeW, cubeD);
-			x += 30;
+			if (map[i][j] == 1) drawCube(x, y, z, cubeW, cubeW, cubeD);
+			x += cubeW;
 		}
-		y += 30;
+		y += cubeH;
 	}
 }
 
@@ -64,6 +84,10 @@ function drawCube(x, y, z, boxW, boxH, boxD) {
 	push();
 	translate(x, y, z);
 	normalMaterial();
+
+	rotateY(rotY);
+	rotateX(rotX);
+	
 	box(boxW, boxH, boxD);
 	pop();
 }
